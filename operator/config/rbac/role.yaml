@@ -1,0 +1,58 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - echojobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - echojobs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - echojobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - idlePods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - idlePods/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - idlePods/status
+  verbs:
+  - get
+  - patch
+  - update

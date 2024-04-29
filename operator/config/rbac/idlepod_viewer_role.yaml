@@ -1,0 +1,27 @@
+# permissions for end users to view clusters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: idlepod-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: operator
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: idlepod-viewer-role
+rules:
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - idlepods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch.littlemay.io
+  resources:
+  - idlepods/status
+  verbs:
+  - get

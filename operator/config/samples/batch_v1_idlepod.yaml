@@ -1,0 +1,22 @@
+apiVersion: batch.littlemay.io/v1
+kind: IdlePod
+metadata:
+  labels:
+    app.kubernetes.io/name: idlePod
+    app.kubernetes.io/instance: idlePod-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: idlepod-sample2
+spec:
+  definition: "test1"
+  template:
+    spec:
+      containers:
+        - name: hello
+          image: busybox
+          args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+      restartPolicy: Never

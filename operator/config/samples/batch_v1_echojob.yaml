@@ -1,0 +1,12 @@
+apiVersion: batch.littlemay.io/v1
+kind: EchoJob
+metadata:
+  labels:
+    app.kubernetes.io/name: echojob
+    app.kubernetes.io/instance: echojob-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: echojob-sample
+spec:
+  # TODO(user): Add fields here

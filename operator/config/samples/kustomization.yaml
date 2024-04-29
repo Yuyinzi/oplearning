@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- batch_v1_echojob.yaml
+- batch_v1_idlepod.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
