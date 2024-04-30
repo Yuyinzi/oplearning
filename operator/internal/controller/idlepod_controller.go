@@ -23,11 +23,11 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	batchv1 "kube_stuff/api/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	batchv1 "kube_stuff/api/v1"
 )
 
 // IdlePodReconciler reconciles a IdlePod object
@@ -56,7 +56,8 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	err := r.Get(ctx, req.NamespacedName, &IdlePodResource)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return ctrl.Result{}, err
+			fmt.Println(err)
+			return ctrl.Result{}, nil
 		}
 	}
 	// Check if the resource is being deleted
@@ -78,7 +79,10 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			},
 			Spec: *IdlePodResource.Spec.PodTemplate.Spec.DeepCopy(),
 		}
-
+		// when deleting the crd, k8s could delete corresponding pods automatically
+		if err := controllerutil.SetControllerReference(&IdlePodResource, IdlePod, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
 		if err := r.Create(ctx, IdlePod); err != nil {
 			return ctrl.Result{}, err
 		}
