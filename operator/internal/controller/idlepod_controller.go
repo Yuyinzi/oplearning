@@ -30,6 +30,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+const (
+	finalizer = "idlepod.littlemay.io/finalizer"
+)
+
 // IdlePodReconciler reconciles a IdlePod object
 type IdlePodReconciler struct {
 	client.Client
@@ -56,15 +60,21 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	err := r.Get(ctx, req.NamespacedName, &IdlePodResource)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			fmt.Println(err)
 			return ctrl.Result{}, nil
 		}
 	}
 	// Check if the resource is being deleted
 	if !IdlePodResource.ObjectMeta.DeletionTimestamp.IsZero() {
 		// Resource is being deleted, handle the deletion process
-		fmt.Println("Deleting IdlePod resource")
-		return ctrl.Result{}, nil
+		if controllerutil.ContainsFinalizer(&IdlePodResource, finalizer) {
+			fmt.Println("start cleanup...")
+			// do sth
+			controllerutil.RemoveFinalizer(&IdlePodResource, finalizer)
+			if err := r.Update(ctx, &IdlePodResource); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		fmt.Println("Delete IdlePod resource")
 	}
 
 	// use definition to distinguish a crd temporarily
@@ -83,10 +93,11 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if err := controllerutil.SetControllerReference(&IdlePodResource, IdlePod, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
+		controllerutil.AddFinalizer(&IdlePodResource, finalizer)
 		if err := r.Create(ctx, IdlePod); err != nil {
 			return ctrl.Result{}, err
 		}
-		fmt.Println("Created new pod")
+		fmt.Println("Create new pod")
 		IdlePodResource.Spec.Definition = "hello world"
 		if err := r.Update(ctx, &IdlePodResource); err != nil {
 			return ctrl.Result{}, err
