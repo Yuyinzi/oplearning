@@ -39,9 +39,10 @@ type IdlePodStatus struct {
 	Phase string `json:"phase,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 // IdlePod is the Schema for the IdlePods API
 type IdlePod struct {
 	metav1.TypeMeta   `json:",inline"`
