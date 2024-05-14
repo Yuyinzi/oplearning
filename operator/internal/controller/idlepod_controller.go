@@ -78,7 +78,7 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// use definition to distinguish a crd temporarily
-	if IdlePodResource.Spec.Definition != "hello world" {
+	if IdlePodResource.Status.Phase == "" || IdlePodResource.Status.Phase == "Creating" {
 		// Create a new Pod
 		IdlePod := &corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
@@ -99,7 +99,14 @@ func (r *IdlePodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		fmt.Println("Create new pod")
 		IdlePodResource.Spec.Definition = "hello world"
+
 		if err := r.Update(ctx, &IdlePodResource); err != nil {
+			return ctrl.Result{}, err
+		}
+		// should update the status use r.Status().Update
+		// should assign value to status after update IdlePodResource, otherwise the value will be wiped out after using r.Update
+		IdlePodResource.Status.Phase = "In progress"
+		if err := r.Status().Update(ctx, &IdlePodResource); err != nil {
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, nil
